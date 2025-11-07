@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Reservar Turno - TurnoSport</title>
+    <link rel="stylesheet" href="css/reservar-turno.css">
+</head>
+<body>
+    <nav class="navbar">
+        <div class="nav-content">
+            <h1>TurnoSport</h1>
+            <img src="img/logo.solo.jpg" alt="TurnoSport Logo">
+            <div class="nav-right">
+                <span id="userName">Bienvenido</span>
+                <button onclick="cerrarSesion()" class="btn-logout">Cerrar Sesión</button>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container"> 
+        <!-- PASO 1: SELECCIÓN DE DEPORTE -->
+        <div class="seccion" id="seccionDeporte">
+            <h2 class="titulo-seccion">Paso 1: Selecciona un Deporte</h2>
+            <div class="deportes-grid">
+                <!-- Los deportes se cargan dinámicamente -->
+            </div>
+        </div>
+
+        <!-- PASO 2: SELECCIÓN DE LOCALIDAD -->
+        <div class="seccion" id="seccionLocalidad" style="display: none;">
+            <h2 class="titulo-seccion">Paso 2: Selecciona una Localidad</h2>
+            <div class="deporte-seleccionado-badge">
+                <span>Deporte: </span><strong id="deporteSeleccionado"></strong>
+                <button onclick="cambiarDeporte()" class="btn-cambiar">Cambiar</button>
+            </div>
+            <div class="localidades-grid">
+                <!-- Las localidades se cargan dinámicamente -->
+            </div>
+        </div>
+
+        <!-- PASO 3: SELECCIÓN DE FECHA -->
+        <div class="seccion" id="seccionFecha" style="display: none;">
+            <h2 class="titulo-seccion">Paso 3: Selecciona una Fecha</h2>
+            <div class="info-seleccion">
+                <span>⚽ <strong id="deporteSeleccionado2"></strong></span>
+                <span>📍 <strong id="localidadSeleccionada"></strong></span>
+                <button onclick="cambiarLocalidad()" class="btn-cambiar">Cambiar</button>
+            </div>
+            <div class="fecha-card">
+                <input type="date" id="fechaInput" class="fecha-input">
+                <button onclick="buscarCanchas()" class="btn-buscar">Buscar Canchas</button>
+            </div>
+        </div>
+
+        <!-- PASO 4: CANCHAS DISPONIBLES -->
+        <div class="seccion" id="seccionCanchas" style="display: none;">
+            <h2 class="titulo-seccion">Paso 4: Selecciona una Cancha y Horario</h2>
+            <div class="info-seleccion">
+                <div>
+                    <span>⚽ <strong id="deporteSeleccionado3"></strong></span> | 
+                    <span>📍 <strong id="localidadSeleccionada2"></strong></span> | 
+                    <span>📅 <strong id="fechaSeleccionada"></strong></span>
+                </div>
+                <button onclick="cambiarFecha()" class="btn-cambiar">Cambiar fecha</button>
+            </div>
+            
+            <div id="loading" class="loading" style="display: none;">
+                <p>Cargando canchas disponibles...</p>
+            </div>
+            
+            <div id="canchasGrid" class="canchas-grid"></div>
+            
+            <div id="noCanchas" class="no-canchas" style="display: none;">
+                <p>😔 No hay canchas disponibles para esta fecha</p>
+                <button onclick="cambiarFecha()" class="btn-secondary">Elegir otra fecha</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="js/reservar.js"></script>
+</body>
+</html>

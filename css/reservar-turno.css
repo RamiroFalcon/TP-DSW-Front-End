@@ -1,0 +1,355 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background: linear-gradient(135deg, #0d5e47, #148761, #1ba97a);
+    min-height: 100vh;
+}
+
+/* NAVBAR */
+.navbar {
+    background: #fefce8;
+    padding: 1rem 0;
+    border-bottom: 3px solid #0d5e47;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+}
+
+.nav-content {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 2rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.nav-content h1 {
+    color: #0d5e47;
+    font-size: 1.8rem;
+}
+
+.nav-content img {
+    height: 50px;
+}
+
+.nav-right {
+    display: flex;
+    gap: 1rem;
+    align-items: center;
+}
+
+#userName {
+    color: #0d5e47;
+    font-weight: 600;
+}
+
+.btn-logout {
+    background: #C20A0A;
+    color: white;
+    border: none;
+    padding: 0.5rem 1rem;
+    border-radius: 5px;
+    cursor: pointer;
+    font-weight: 600;
+}
+
+.btn-logout:hover {
+    background: #a00808;
+}
+
+/* CONTENEDOR */
+.container {
+    max-width: 1200px;
+    margin: 2rem auto;
+    padding: 0 2rem;
+}
+
+.seccion {
+    background: #fefce8;
+    border: 3px solid #0d5e47;
+    border-radius: 15px;
+    padding: 2rem;
+    margin-bottom: 2rem;
+}
+
+.titulo-seccion {
+    color: #0d5e47;
+    font-size: 1.8rem;
+    text-align: center;
+    margin-bottom: 1.5rem;
+}
+
+/* DEPORTES */
+.deportes-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1.5rem;
+}
+
+.deporte-card {
+    background: white;
+    border: 3px solid #1ba97a;
+    border-radius: 12px;
+    padding: 2rem 1rem;
+    text-align: center;
+    cursor: pointer;
+}
+
+.deporte-card:hover {
+    border-color: #0d5e47;
+    transform: translateY(-5px);
+}
+
+.deporte-icon {
+    font-size: 3.5rem;
+    margin-bottom: 1rem;
+}
+
+.deporte-card h3 {
+    color: #0d5e47;
+    font-size: 1.3rem;
+    margin-bottom: 0.5rem;
+}
+
+.deporte-card p {
+    color: #148761;
+}
+
+/* LOCALIDADES */
+.localidades-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1.5rem;
+}
+
+.localidad-card {
+    background: white;
+    border: 3px solid #1ba97a;
+    border-radius: 12px;
+    padding: 2rem 1rem;
+    text-align: center;
+    cursor: pointer;
+}
+
+.localidad-card:hover {
+    border-color: #0d5e47;
+    transform: translateY(-5px);
+}
+
+.localidad-icon {
+    font-size: 3rem;
+    margin-bottom: 1rem;
+}
+
+.localidad-card h3 {
+    color: #0d5e47;
+    font-size: 1.3rem;
+    margin-bottom: 0.5rem;
+}
+
+.localidad-card p {
+    color: #148761;
+}
+
+/* BADGES */
+.deporte-seleccionado-badge,
+.info-seleccion {
+    background: #e8f5f1;
+    border: 2px solid #1ba97a;
+    border-radius: 8px;
+    padding: 1rem;
+    margin-bottom: 1.5rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+}
+
+.deporte-seleccionado-badge span,
+.info-seleccion span {
+    color: #0d5e47;
+}
+
+.deporte-seleccionado-badge strong,
+.info-seleccion strong {
+    color: #0d5e47;
+    text-transform: capitalize;
+}
+
+/* BOTONES */
+.btn-cambiar {
+    background: white;
+    color: #0d5e47;
+    border: 2px solid #0d5e47;
+    padding: 0.5rem 1rem;
+    border-radius: 5px;
+    cursor: pointer;
+    font-weight: 600;
+}
+
+.btn-cambiar:hover {
+    background: #0d5e47;
+    color: white;
+}
+
+.btn-buscar {
+    background: linear-gradient(135deg, #0d5e47, #1ba97a);
+    color: white;
+    border: none;
+    padding: 1rem 2rem;
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: 700;
+}
+
+.btn-buscar:hover {
+    opacity: 0.9;
+}
+
+.btn-secondary {
+    background: #148761;
+    color: white;
+    border: none;
+    padding: 0.8rem 1.5rem;
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: 600;
+}
+
+.btn-secondary:hover {
+    background: #0d5e47;
+}
+
+/* FECHA */
+.fecha-card {
+    display: flex;
+    gap: 1rem;
+    max-width: 600px;
+    margin: 0 auto;
+}
+
+.fecha-input {
+    flex: 1;
+    padding: 1rem;
+    border: 2px solid #1ba97a;
+    border-radius: 8px;
+    background: white;
+    color: #0d5e47;
+}
+
+.fecha-input:focus {
+    outline: none;
+    border-color: #0d5e47;
+}
+
+/* CANCHAS */
+.loading {
+    text-align: center;
+    padding: 2rem;
+    color: #0d5e47;
+    font-size: 1.1rem;
+}
+
+.canchas-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 1.5rem;
+}
+
+.cancha-card {
+    background: white;
+    border: 3px solid #1ba97a;
+    border-radius: 12px;
+    padding: 1.5rem;
+}
+
+.cancha-card:hover {
+    border-color: #0d5e47;
+}
+
+.cancha-card h4 {
+    color: #0d5e47;
+    font-size: 1.3rem;
+    margin-bottom: 1rem;
+}
+
+.cancha-info p {
+    color: #148761;
+    margin: 0.5rem 0;
+}
+
+.horarios-disponibles {
+    margin-top: 1rem;
+}
+
+.horarios-disponibles h5 {
+    color: #0d5e47;
+    margin-bottom: 0.8rem;
+}
+
+.horarios-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 0.5rem;
+}
+
+.horario-btn {
+    background: linear-gradient(135deg, #0d5e47, #148761);
+    color: white;
+    border: none;
+    padding: 0.6rem;
+    border-radius: 5px;
+    cursor: pointer;
+    font-weight: 600;
+}
+
+.horario-btn:hover {
+    opacity: 0.9;
+}
+
+.no-canchas {
+    text-align: center;
+    padding: 3rem;
+    color: #0d5e47;
+}
+
+/* RESPONSIVE */
+@media (max-width: 768px) {
+    .nav-content {
+        flex-direction: column;
+        gap: 1rem;
+    }
+
+    .nav-content img {
+        height: 40px;
+    }
+
+    .deportes-grid,
+    .localidades-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+    .fecha-card {
+        flex-direction: column;
+    }
+
+    .canchas-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .horarios-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+    .info-seleccion {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+}
