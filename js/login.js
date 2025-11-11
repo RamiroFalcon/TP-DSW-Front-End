@@ -42,22 +42,26 @@ document.addEventListener('DOMContentLoaded', function() {
             const data = await response.json();
             console.log('Respuesta del backend:', data);
 
-            // Verificar si el login fue exitoso (SIN verificar token)
-            if (response.ok && data.success) {
-                // Guardar solo los datos del usuario
+            // Tu backend devuelve data.data (no data.user)
+            if (response.ok && data.success && data.data) {
+                const user = data.data; // ← Cambio aquí
+                
+                // Guardar datos del usuario
                 sessionStorage.setItem('userData', JSON.stringify({
-                    id: data.user.id_usuario,
-                    username: data.user.username,
-                    nombre: data.user.nombre,
-                    apellido: data.user.apellido,
-                    email: data.user.email,
-                    rol: data.user.rol
+                    id: user.id_usuario,
+                    id_usuario: user.id_usuario,
+                    username: user.username,
+                    nombre: user.nombre,
+                    apellido: user.apellido,
+                    email: user.email,
+                    dni: user.dni,
+                    rol: user.rol
                 }));
                 
                 mostrarMensaje('Login exitoso! Redirigiendo...', 'success');
                 
                 setTimeout(() => {
-                    if (data.user.rol === 'administrador') {
+                    if (user.rol === 'administrador') {
                         window.location.href = 'admin-dashboard.html';
                     } else {
                         window.location.href = 'reservar-turno.html';
@@ -68,7 +72,7 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         } catch (error) {
             console.error('Error en login:', error);
-            mostrarMensaje('Error de conexión. Verifica que el backend esté funcionando.', 'error');
+            mostrarMensaje('Error de conexión. Verifica que el backend esté funcionando en localhost:3000', 'error');
         }
     });
 });

@@ -18,7 +18,8 @@ function verificarAdmin() {
     }
 
     const usuario = JSON.parse(userData);
-    if (usuario.rol !== 'admin') {
+    // Cambiar 'admin' por 'administrador' según tu BD
+    if (usuario.rol !== 'administrador' && usuario.rol !== 'admin') {
         alert('Acceso restringido a administradores.');
         window.location.href = 'index.html';
         return;
@@ -26,7 +27,7 @@ function verificarAdmin() {
 
     const adminName = document.getElementById('adminName');
     if (adminName) {
-        adminName.textContent = `Panel de administración - ${usuario.nombre}`;
+        adminName.textContent = `${usuario.nombre} ${usuario.apellido}`;
     }
 }
 

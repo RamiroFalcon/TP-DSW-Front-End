@@ -1,59 +1,73 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>TurnoSport - Panel de Administración</title>
-  <link rel="stylesheet" href="css/styles.css">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Panel Administrador</title>
+    <link rel="stylesheet" href="css/admin-dashboard.css">
 </head>
 <body>
-  <div class="container">
-    <div class="login-box">
-      <div class="logo">
-        <img src="img/logo.png" alt="TurnoSport Logo">
-        <p class="tagline">Panel de Administración</p>
-      </div>
-
-      <div class="login-form">
-        <h2>Bienvenido, Administrador</h2>
-        <p class="subtitle">Selecciona una sección para gestionar:</p>
-        
-            <br><br>
-
-        <div class="admin-options">
-          <button class="btn-login" onclick="window.location.href='usuarios.html'">👤 Usuarios</button>
-           <br><br>
-          <button class="btn-login" onclick="window.location.href='canchas.html'">⚽ Canchas</button>
-           <br><br>
-          <button class="btn-login" onclick="window.location.href='reservas.html'">📅 Reservas</button>
-           <br><br>
-          <button class="btn-login" onclick="window.location.href='servicios.html'">🧺 Servicios</button>
-           <br><br>
-          <button class="btn-login" onclick="window.location.href='precios.html'">💲 Precios</button>
+    <nav class="navbar">
+        <div class="nav-content">
+            <h1>Panel de Administración - TurnoSport</h1>
+            <div class="nav-right">
+                <span id="adminName">Admin</span>
+                <button onclick="cerrarSesion()" class="btn-logout">Cerrar Sesión</button>
+            </div>
         </div>
+    </nav>
 
-        <button class="btn-logout" onclick="logout()">Cerrar sesión</button>
-      </div>
+    <div class="container">
+        <h2>Gestión del Sistema</h2>
+        
+        <!-- Dashboard Cards -->
+        <div class="dashboard-grid">
+            <div class="dashboard-card">
+                <div class="card-icon">📍</div>
+                <h3>Localidades</h3>
+                <ul id="listaLocalidades"></ul>
+                <input type="text" id="nuevaLocalidad" placeholder="Nueva localidad">
+                <button class="btn-action btn-primary" onclick="agregarLocalidad()">➕ Agregar</button>
+            </div>
+
+            <div class="dashboard-card">
+                <div class="card-icon">🏟️</div>
+                <h3>Tipos de Cancha</h3>
+                <ul id="listaTiposCanchas"></ul>
+                <input type="text" id="nuevoTipoCancha" placeholder="Nuevo tipo">
+                <button class="btn-action btn-primary" onclick="agregarTipoCancha()">➕ Agregar</button>
+            </div>
+
+            <div class="dashboard-card">
+                <div class="card-icon">⚽</div>
+                <h3>Canchas</h3>
+                <ul id="listaCanchas"></ul>
+                <input type="text" id="nombreCancha" placeholder="Nombre cancha">
+                <select id="selectLocalidad"></select>
+                <select id="selectTipoCancha"></select>
+                <button class="btn-action btn-primary" onclick="agregarCancha()">➕ Agregar</button>
+            </div>
+
+            <div class="dashboard-card">
+                <div class="card-icon">💰</div>
+                <h3>Precios</h3>
+                <ul id="listaPrecios"></ul>
+                <input type="text" id="descripcionPrecio" placeholder="Descripción">
+                <input type="number" id="valorPrecio" placeholder="Valor">
+                <button class="btn-action btn-primary" onclick="agregarPrecio()">➕ Agregar</button>
+            </div>
+
+            <div class="dashboard-card">
+                <div class="card-icon">🧴</div>
+                <h3>Servicios</h3>
+                <ul id="listaServicios"></ul>
+                <input type="text" id="nombreServicio" placeholder="Nombre servicio">
+                <input type="number" id="precioServicio" placeholder="Precio">
+                <button class="btn-action btn-secondary" onclick="agregarServicio()">➕ Agregar</button>
+            </div>
+        </div>
     </div>
-  </div>
 
-  <footer>
-    <p>© 2025 TurnoSport. Todos los derechos reservados.</p>
-  </footer>
-
-  <script>
-    // Verifica acceso de administrador
-    const userData = JSON.parse(localStorage.getItem('userData') || sessionStorage.getItem('userData'));
-    if (!userData || userData.rol !== 'admin') {
-      alert('Acceso denegado. Solo administradores.');
-      window.location.href = 'index.html';
-    }
-
-    function logout() {
-      localStorage.clear();
-      sessionStorage.clear();
-      window.location.href = 'index.html';
-    }
-  </script>
+    <script src="js/admin.js"></script>
 </body>
 </html>
