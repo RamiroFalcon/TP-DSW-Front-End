@@ -5,7 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>TurnoSport - Login</title>
     <link rel="stylesheet" href="css/styles.css">
-   
 </head>
 <body>
     <div class="container">
@@ -26,6 +25,15 @@
                 <div class="form-group">
                     <label for="password">Contraseña</label>
                     <input type="password" id="password" name="password" required placeholder="Ingrese su contraseña">
+                </div>
+
+                <!-- 👇 Nuevo: selector de rol -->
+                <div class="form-group">
+                    <label for="rol">Rol</label>
+                    <select id="rol" name="rol" required>
+                        <option value="usuario">Usuario</option>
+                        <option value="admin">Administrador</option>
+                    </select>
                 </div>
                 
                 <div class="form-options">

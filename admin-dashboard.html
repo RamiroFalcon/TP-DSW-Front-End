@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>TurnoSport - Panel de Administración</title>
+  <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+  <div class="container">
+    <div class="login-box">
+      <div class="logo">
+        <img src="img/logo.png" alt="TurnoSport Logo">
+        <p class="tagline">Panel de Administración</p>
+      </div>
+
+      <div class="login-form">
+        <h2>Bienvenido, Administrador</h2>
+        <p class="subtitle">Selecciona una sección para gestionar:</p>
+        
+            <br><br>
+
+        <div class="admin-options">
+          <button class="btn-login" onclick="window.location.href='usuarios.html'">👤 Usuarios</button>
+           <br><br>
+          <button class="btn-login" onclick="window.location.href='canchas.html'">⚽ Canchas</button>
+           <br><br>
+          <button class="btn-login" onclick="window.location.href='reservas.html'">📅 Reservas</button>
+           <br><br>
+          <button class="btn-login" onclick="window.location.href='servicios.html'">🧺 Servicios</button>
+           <br><br>
+          <button class="btn-login" onclick="window.location.href='precios.html'">💲 Precios</button>
+        </div>
+
+        <button class="btn-logout" onclick="logout()">Cerrar sesión</button>
+      </div>
+    </div>
+  </div>
+
+  <footer>
+    <p>© 2025 TurnoSport. Todos los derechos reservados.</p>
+  </footer>
+
+  <script>
+    // Verifica acceso de administrador
+    const userData = JSON.parse(localStorage.getItem('userData') || sessionStorage.getItem('userData'));
+    if (!userData || userData.rol !== 'admin') {
+      alert('Acceso denegado. Solo administradores.');
+      window.location.href = 'index.html';
+    }
+
+    function logout() {
+      localStorage.clear();
+      sessionStorage.clear();
+      window.location.href = 'index.html';
+    }
+  </script>
+</body>
+</html>
