@@ -1,67 +1,87 @@
 const API_URL = 'http://localhost:3000/api';
 
-// ⚙️ MODO DE PRUEBA
-const MODO_PRUEBA = true;
-
 document.addEventListener('DOMContentLoaded', function() {
     console.log('Login.js cargado correctamente');
     
     const loginForm = document.getElementById('loginForm');
     
-    loginForm.addEventListener('submit', function(e) {
+    if (!loginForm.innerHTML.trim()) {
+        loginForm.innerHTML = `
+            <h2>Iniciar Sesión</h2>
+            <div class="form-group">
+                <label for="username">Usuario:</label>
+                <input type="text" id="username" name="username" required>
+            </div>
+            
+            <div class="form-group">
+                <label for="password">Contraseña:</label>
+                <input type="password" id="password" name="password" required>
+            </div>
+            
+            <button type="submit" class="btn-login">Iniciar Sesión</button>
+            
+            <div id="message" class="message" style="display: none;"></div>
+        `;
+    }
+    
+    loginForm.addEventListener('submit', async function(e) {
         e.preventDefault();
-        console.log('Formulario enviado');
         
         const username = document.getElementById('username').value;
         const password = document.getElementById('password').value;
-        const remember = document.getElementById('remember').checked;
         
-        console.log('Usuario:', username);
-        
-        if (MODO_PRUEBA) {
-            // Usuarios de prueba
-            const usuariosPrueba = {
-                'admin': { password: 'admin123', rol: 'admin', nombre: 'Administrador' },
-                'cliente': { password: 'cliente123', rol: 'cliente', nombre: 'Juan Pérez' },
-                'test': { password: 'test', rol: 'cliente', nombre: 'Usuario Test' }
-            };
-            
-            const usuario = usuariosPrueba[username];
-            
-            if (usuario && usuario.password === password) {
-                // Login exitoso
-                const storage = remember ? localStorage : sessionStorage;
-                storage.setItem('token', 'token-de-prueba-123');
-                storage.setItem('userData', JSON.stringify({
-                    username: username,
-                    nombre: usuario.nombre,
-                    rol: usuario.rol
+        try {
+            const response = await fetch(`${API_URL}/auth/login`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ username, password })
+            });
+
+            const data = await response.json();
+            console.log('Respuesta del backend:', data);
+
+            // Verificar si el login fue exitoso (SIN verificar token)
+            if (response.ok && data.success) {
+                // Guardar solo los datos del usuario
+                sessionStorage.setItem('userData', JSON.stringify({
+                    id: data.user.id_usuario,
+                    username: data.user.username,
+                    nombre: data.user.nombre,
+                    apellido: data.user.apellido,
+                    email: data.user.email,
+                    rol: data.user.rol
                 }));
                 
                 mostrarMensaje('Login exitoso! Redirigiendo...', 'success');
                 
                 setTimeout(() => {
-                    if (usuario.rol === 'admin') {
+                    if (data.user.rol === 'administrador') {
                         window.location.href = 'admin-dashboard.html';
                     } else {
                         window.location.href = 'reservar-turno.html';
                     }
                 }, 1000);
             } else {
-                mostrarMensaje('Usuario o contraseña incorrectos', 'error');
+                mostrarMensaje(data.message || 'Usuario o contraseña incorrectos', 'error');
             }
-            return;
+        } catch (error) {
+            console.error('Error en login:', error);
+            mostrarMensaje('Error de conexión. Verifica que el backend esté funcionando.', 'error');
         }
     });
 });
 
 function mostrarMensaje(texto, tipo) {
     const messageDiv = document.getElementById('message');
-    messageDiv.textContent = texto;
-    messageDiv.className = `message ${tipo}`;
-    messageDiv.style.display = 'block';
-    
-    setTimeout(() => {
-        messageDiv.style.display = 'none';
-    }, 3000);
+    if (messageDiv) {
+        messageDiv.textContent = texto;
+        messageDiv.className = `message ${tipo}`;
+        messageDiv.style.display = 'block';
+        
+        setTimeout(() => {
+            messageDiv.style.display = 'none';
+        }, 3000);
+    }
 }
