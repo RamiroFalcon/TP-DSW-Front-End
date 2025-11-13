@@ -6,7 +6,7 @@
       'servicios': API_BASE + '/api/servicios',
       'precios': API_BASE + '/api/precios',
       'reservas': API_BASE + '/api/reservas',
-      'disponibilidad': API_BASE + '/api/canchas/disponibilidad',
+      'buscar-canchas': API_BASE + '/api/buscar-canchas',
       'pagos': API_BASE + '/api/pagos'
     };
 
@@ -247,10 +247,10 @@
           mostrarPasoFecha();
           break;
         case 4:
-          mostrarPasoHorario();
+          mostrarPasoCanchas();
           break;
         case 5:
-          mostrarPasoCanchas();
+          mostrarPasoHorario();
           break;
         case 6:
           mostrarPasoServicios();
@@ -269,14 +269,14 @@
           <div class="step">
             <div class="step-header">
               <div class="step-number">1</div>
-              <h3 class="step-title">Seleccioná la Localidad</h3>
+              <h3 class="step-title">Paso 1: Seleccioná la Localidad</h3>
             </div>
             <div class="step-content">
               <p class="muted">Elegí en qué localidad querés jugar</p>
-              <div class="options-grid">
-                ${localidades.map(localidad => `
+              <div class="options-grid" id="localidadesGrid">
+                ${localidades.map((localidad, index) => `
                   <div class="option-card ${reservaActual.localidad?.id_localidad === localidad.id_localidad ? 'selected' : ''}" 
-                       onclick="seleccionarLocalidad(${JSON.stringify(localidad).replace(/"/g, '&quot;')})">
+                       data-index="${index}">
                     <div class="option-icon">
                       <i class="fa fa-map-marker-alt"></i>
                     </div>
@@ -286,9 +286,6 @@
               </div>
               <div class="navigation-buttons">
                 <button class="btn" onclick="cargarSeccion('mis-reservas')">Cancelar</button>
-                <button class="btn primary" onclick="siguientePaso()" ${!reservaActual.localidad ? 'disabled' : ''}>
-                  Siguiente <i class="fa fa-arrow-right"></i>
-                </button>
               </div>
             </div>
           </div>
@@ -296,6 +293,15 @@
       `;
 
       document.getElementById('contentArea').innerHTML = html;
+      
+      // Agregar event listeners después de insertar el HTML
+      setTimeout(() => {
+        document.querySelectorAll('#localidadesGrid .option-card').forEach((card, index) => {
+          card.addEventListener('click', () => {
+            seleccionarLocalidad(localidades[index]);
+          });
+        });
+      }, 0);
     }
 
     function mostrarPasoDeporte() {
@@ -306,14 +312,15 @@
           <div class="step">
             <div class="step-header">
               <div class="step-number">2</div>
-              <h3 class="step-title">Seleccioná el Deporte</h3>
+              <h3 class="step-title">Paso 2: Seleccioná el Deporte</h3>
             </div>
             <div class="step-content">
+              <p class="muted"><strong>Localidad:</strong> ${escapeHtml(reservaActual.localidad?.nombre || '')}</p>
               <p class="muted">Elegí qué deporte querés practicar</p>
-              <div class="options-grid">
-                ${tipos.map(tipo => `
+              <div class="options-grid" id="deportesGrid">
+                ${tipos.map((tipo, index) => `
                   <div class="option-card ${reservaActual.deporte?.id_tipo === tipo.id_tipo ? 'selected' : ''}" 
-                       onclick="seleccionarDeporte(${JSON.stringify(tipo).replace(/"/g, '&quot;')})">
+                       data-index="${index}">
                     <div class="option-icon">
                       <i class="fa fa-futbol"></i>
                     </div>
@@ -324,9 +331,6 @@
               </div>
               <div class="navigation-buttons">
                 <button class="btn" onclick="anteriorPaso()"><i class="fa fa-arrow-left"></i> Anterior</button>
-                <button class="btn primary" onclick="siguientePaso()" ${!reservaActual.deporte ? 'disabled' : ''}>
-                  Siguiente <i class="fa fa-arrow-right"></i>
-                </button>
               </div>
             </div>
           </div>
@@ -334,6 +338,15 @@
       `;
 
       document.getElementById('contentArea').innerHTML = html;
+      
+      // Agregar event listeners
+      setTimeout(() => {
+        document.querySelectorAll('#deportesGrid .option-card').forEach((card, index) => {
+          card.addEventListener('click', () => {
+            seleccionarDeporte(tipos[index]);
+          });
+        });
+      }, 0);
     }
 
     function mostrarPasoFecha() {
@@ -347,21 +360,20 @@
           <div class="step">
             <div class="step-header">
               <div class="step-number">3</div>
-              <h3 class="step-title">Seleccioná la Fecha</h3>
+              <h3 class="step-title">Paso 3: Seleccioná la Fecha</h3>
             </div>
             <div class="step-content">
+              <p class="muted"><strong>Localidad:</strong> ${escapeHtml(reservaActual.localidad?.nombre || '')}</p>
+              <p class="muted"><strong>Deporte:</strong> ${escapeHtml(reservaActual.deporte?.deporte || reservaActual.deporte?.nombre || '')}</p>
+              <br>
               <p class="muted">Elegí para qué día querés reservar</p>
               <input type="date" id="fechaReserva" 
-                     value="${reservaActual.fecha || hoy}" 
+                     value="${reservaActual.fecha || ''}" 
                      min="${hoy}" 
                      max="${maxFechaStr}"
-                     style="padding: 12px; font-size: 16px; width: 100%; max-width: 300px;"
-                     onchange="seleccionarFecha(this.value)">
+                     style="padding: 12px; font-size: 16px; width: 100%; max-width: 300px;">
               <div class="navigation-buttons">
                 <button class="btn" onclick="anteriorPaso()"><i class="fa fa-arrow-left"></i> Anterior</button>
-                <button class="btn primary" onclick="siguientePaso()" ${!reservaActual.fecha ? 'disabled' : ''}>
-                  Siguiente <i class="fa fa-arrow-right"></i>
-                </button>
               </div>
             </div>
           </div>
@@ -369,24 +381,153 @@
       `;
 
       document.getElementById('contentArea').innerHTML = html;
+      
+      // Agregar event listener para el cambio de fecha
+      setTimeout(() => {
+        const fechaInput = document.getElementById('fechaReserva');
+        if (fechaInput) {
+          fechaInput.addEventListener('change', (e) => {
+            seleccionarFecha(e.target.value);
+          });
+        }
+      }, 0);
     }
 
-    async function mostrarPasoHorario() {
+    async function mostrarPasoCanchas() {
       const html = `
         <div class="reserva-flow">
           <div class="step">
             <div class="step-header">
               <div class="step-number">4</div>
-              <h3 class="step-title">Seleccioná el Horario</h3>
+              <h3 class="step-title">Paso 4: Seleccioná la Cancha</h3>
             </div>
             <div class="step-content">
-              <p class="muted">Buscando horarios disponibles...</p>
-              <div id="horariosContainer"></div>
+              <p class="muted"><strong>Localidad:</strong> ${escapeHtml(reservaActual.localidad?.nombre || '')}</p>
+              <p class="muted"><strong>Deporte:</strong> ${escapeHtml(reservaActual.deporte?.deporte || reservaActual.deporte?.nombre || '')}</p>
+              <p class="muted"><strong>Fecha:</strong> ${reservaActual.fecha || ''}</p>
+              <br>
+              <div id="canchasContainer">Cargando canchas disponibles...</div>
               <div class="navigation-buttons">
                 <button class="btn" onclick="anteriorPaso()"><i class="fa fa-arrow-left"></i> Anterior</button>
-                <button class="btn primary" onclick="siguientePaso()" ${!reservaActual.horario ? 'disabled' : ''}>
-                  Siguiente <i class="fa fa-arrow-right"></i>
-                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      `;
+
+      document.getElementById('contentArea').innerHTML = html;
+      await cargarCanchasParaSeleccionar();
+    }
+
+    async function cargarCanchasParaSeleccionar() {
+      try {
+        // Validar que tengamos todos los datos necesarios
+        if (!reservaActual.fecha || !reservaActual.localidad || !reservaActual.deporte) {
+          console.error('❌ Faltan datos:', {
+            fecha: reservaActual.fecha,
+            localidad: reservaActual.localidad,
+            deporte: reservaActual.deporte
+          });
+          document.getElementById('canchasContainer').innerHTML = `
+            <div class="table-empty">
+              <p>Faltan datos para buscar canchas. Por favor volvé y completá todos los pasos.</p>
+            </div>
+          `;
+          return;
+        }
+
+        // Preparar el body con nombres (no IDs) según el backend espera
+        const body = {
+          fecha: reservaActual.fecha,
+          deporte: reservaActual.deporte.deporte || reservaActual.deporte.nombre,
+          localidad: reservaActual.localidad.nombre
+        };
+        
+        console.log('🔍 Buscando canchas con:', body);
+        
+        const response = await fetch(API['buscar-canchas'], {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify(body)
+        });
+        
+        if (!response.ok) {
+          throw new Error(`HTTP ${response.status}`);
+        }
+        
+        const result = await response.json();
+        console.log('📦 Respuesta buscar-canchas:', result);
+        
+        if (!result.success) {
+          throw new Error(result.message || 'Error en la respuesta');
+        }
+        
+        const canchas = result.data?.canchas || [];
+
+        if (canchas.length === 0) {
+          document.getElementById('canchasContainer').innerHTML = `
+            <div class="table-empty">
+              <p>No hay canchas disponibles para esta combinación</p>
+            </div>
+          `;
+          return;
+        }
+
+        const canchasHTML = `
+          <div class="canchas-grid" id="canchasGridSeleccion">
+            ${canchas.map((cancha, index) => {
+              const horariosDisponibles = cancha.horarios_disponibles?.filter(h => h.disponible === true).length || 0;
+              return `
+                <div class="cancha-card ${reservaActual.cancha?.id_cancha === cancha.id_cancha ? 'selected' : ''}"
+                     data-index="${index}">
+                  <h4>${escapeHtml(cancha.nombre)}</h4>
+                  <p class="muted">${escapeHtml(cancha.localidad_nombre)} • ${escapeHtml(cancha.tipo_nombre)}</p>
+                  <p><strong>Horario:</strong> ${cancha.hora_apertura?.substring(0,5) || '08:00'} - ${cancha.hora_cierre?.substring(0,5) || '22:00'}</p>
+                  <p class="badge">${horariosDisponibles} horarios disponibles</p>
+                </div>
+              `;
+            }).join('')}
+          </div>
+        `;
+
+        document.getElementById('canchasContainer').innerHTML = canchasHTML;
+        
+        // Agregar event listeners
+        setTimeout(() => {
+          document.querySelectorAll('#canchasGridSeleccion .cancha-card').forEach((card, index) => {
+            card.addEventListener('click', () => {
+              seleccionarCancha(canchas[index]);
+            });
+          });
+        }, 0);
+      } catch (error) {
+        console.error('❌ Error cargando canchas:', error);
+        document.getElementById('canchasContainer').innerHTML = `
+          <div class="table-empty">
+            <p>Error: ${error.message}</p>
+          </div>
+        `;
+      }
+    }
+    async function mostrarPasoHorario() {
+      const html = `
+        <div class="reserva-flow">
+          <div class="step">
+            <div class="step-header">
+              <div class="step-number">5</div>
+              <h3 class="step-title">Paso 5: Seleccioná el Horario</h3>
+            </div>
+            <div class="step-content">
+              <p class="muted"><strong>Localidad:</strong> ${escapeHtml(reservaActual.localidad?.nombre || '')}</p>
+              <p class="muted"><strong>Deporte:</strong> ${escapeHtml(reservaActual.deporte?.deporte || reservaActual.deporte?.nombre || '')}</p>
+              <p class="muted"><strong>Fecha:</strong> ${reservaActual.fecha || ''}</p>
+              <p class="muted"><strong>Cancha:</strong> ${escapeHtml(reservaActual.cancha?.nombre || '')}</p>
+              <br>
+              <div id="horariosContainer">Cargando horarios...</div>
+              <div class="navigation-buttons">
+                <button class="btn" onclick="anteriorPaso()"><i class="fa fa-arrow-left"></i> Anterior</button>
               </div>
             </div>
           </div>
@@ -397,162 +538,63 @@
       await cargarHorariosDisponibles();
     }
 
-  async function cargarHorariosDisponibles() {
-  try {
-    console.log('🔍 Cargando horarios con:', {
-      fecha: reservaActual.fecha,
-      id_tipo: reservaActual.deporte.id_tipo,
-      id_localidad: reservaActual.localidad.id_localidad
-    });
-
-    const params = new URLSearchParams({
-      fecha: reservaActual.fecha
-    });
-
-    // Solo agregar parámetros si tienen valores válidos
-    if (reservaActual.deporte && reservaActual.deporte.id_tipo) {
-      params.append('id_tipo', reservaActual.deporte.id_tipo.toString());
-    }
-    
-    if (reservaActual.localidad && reservaActual.localidad.id_localidad) {
-      params.append('id_localidad', reservaActual.localidad.id_localidad.toString());
-    }
-
-    console.log('📋 Parámetros enviados:', params.toString());
-
-    const response = await fetch(`${API['disponibilidad']}?${params}`);
-    
-    if (!response.ok) {
-      throw new Error(`Error HTTP: ${response.status}`);
-    }
-    
-    const result = await response.json();
-    console.log('📦 Respuesta del backend:', result);
-
-    if (!result.success) {
-      throw new Error(result.message || 'Error en la respuesta del servidor');
-    }
-
-    const canchas = result.data || [];
-    const todosHorarios = new Set();
-
-    // Recopilar todos los horarios disponibles
-    canchas.forEach(cancha => {
-      console.log(`🏟️ Cancha ${cancha.nombre}:`, cancha.horarios_disponibles);
-      if (cancha.horarios_disponibles && Array.isArray(cancha.horarios_disponibles)) {
-        cancha.horarios_disponibles.forEach(horario => {
-          todosHorarios.add(horario);
-        });
-      }
-    });
-
-    const horariosArray = Array.from(todosHorarios).sort();
-    console.log('🕐 Horarios encontrados:', horariosArray);
-
-    let horariosHTML = '';
-    if (horariosArray.length > 0) {
-      horariosHTML = `
-        <p>Horarios disponibles para ${formatearFecha(reservaActual.fecha)}:</p>
-        <div class="horarios-grid">
-          ${horariosArray.map(horario => `
-            <button class="horario-btn ${reservaActual.horario === horario ? 'selected' : ''}" 
-                    onclick="seleccionarHorario('${horario}')">
-              ${horario.substring(0, 5)}
-            </button>
-          `).join('')}
-        </div>
-      `;
-    } else {
-      horariosHTML = `
-        <div class="table-empty">
-          <p>No hay horarios disponibles para esta fecha</p>
-          <p class="muted">Probá con otra fecha o configuración</p>
-        </div>
-      `;
-    }
-
-    document.getElementById('horariosContainer').innerHTML = horariosHTML;
-  } catch (error) {
-    console.error('❌ Error cargando horarios:', error);
-    document.getElementById('horariosContainer').innerHTML = `
-      <div class="table-empty">
-        <p>Error cargando horarios: ${error.message}</p>
-        <p class="muted">Verifica la consola para más detalles</p>
-      </div>
-    `;
-  }
-}
-    async function mostrarPasoCanchas() {
-      const html = `
-        <div class="reserva-flow">
-          <div class="step">
-            <div class="step-header">
-              <div class="step-number">5</div>
-              <h3 class="step-title">Seleccioná la Cancha</h3>
-            </div>
-            <div class="step-content">
-              <p class="muted">Buscando canchas disponibles...</p>
-              <div id="canchasContainer"></div>
-              <div class="navigation-buttons">
-                <button class="btn" onclick="anteriorPaso()"><i class="fa fa-arrow-left"></i> Anterior</button>
-                <button class="btn primary" onclick="siguientePaso()" ${!reservaActual.cancha ? 'disabled' : ''}>
-                  Siguiente <i class="fa fa-arrow-right"></i>
-                </button>
-              </div>
-            </div>
-          </div>
-        </div>
-      `;
-
-      document.getElementById('contentArea').innerHTML = html;
-      await cargarCanchasDisponibles();
-    }
-
-    async function cargarCanchasDisponibles() {
+    async function cargarHorariosDisponibles() {
       try {
-        const params = new URLSearchParams({
-          fecha: reservaActual.fecha,
-          id_tipo: reservaActual.deporte.id_tipo,
-          id_localidad: reservaActual.localidad.id_localidad
-        });
-
-        const response = await fetch(`${API['disponibilidad']}?${params}`);
-        const result = await response.json();
-
-        if (!result.success) throw new Error(result.message);
-
-        const canchas = result.data || [];
-        
-        let canchasHTML = '';
-        if (canchas.length > 0) {
-          canchasHTML = `
-            <p>Canchas disponibles para ${reservaActual.horario.substring(0, 5)}:</p>
-            <div class="canchas-grid">
-              ${canchas.map(cancha => {
-                const estaDisponible = cancha.horarios_disponibles && 
-                  cancha.horarios_disponibles.includes(reservaActual.horario);
-                
-                return `
-                  <div class="cancha-card ${estaDisponible ? 'disponible' : 'ocupada'} ${reservaActual.cancha?.id_cancha === cancha.id_cancha ? 'selected' : ''}"
-                       onclick="${estaDisponible ? `seleccionarCancha(${JSON.stringify(cancha).replace(/"/g, '&quot;')})` : ''}">
-                    <h4>${escapeHtml(cancha.nombre)}</h4>
-                    <p class="muted">${escapeHtml(cancha.localidad_nombre)} • ${escapeHtml(cancha.tipo_nombre)}</p>
-                    <p><strong>Estado:</strong> ${estaDisponible ? 'Disponible' : 'Ocupada'}</p>
-                    ${estaDisponible ? '' : '<p class="muted">No disponible en este horario</p>'}
-                  </div>
-                `;
-              }).join('')}
-            </div>
-          `;
-        } else {
-          canchasHTML = '<div class="table-empty"><p>No hay canchas disponibles</p></div>';
+        if (!reservaActual.cancha || !reservaActual.fecha) {
+          document.getElementById('horariosContainer').innerHTML = '<div class="table-empty"><p>Falta información de cancha o fecha</p></div>';
+          return;
         }
 
-        document.getElementById('canchasContainer').innerHTML = canchasHTML;
+        // La cancha ya tiene los horarios_disponibles desde el paso anterior
+        const horarios = reservaActual.cancha.horarios_disponibles || [];
+        
+        // Filtrar solo los disponibles
+        const horariosLibres = horarios.filter(h => h.disponible === true);
+
+        if (horariosLibres.length === 0) {
+          document.getElementById('horariosContainer').innerHTML = `
+            <div class="table-empty">
+              <p>No hay horarios disponibles para esta fecha en esta cancha</p>
+            </div>
+          `;
+          return;
+        }
+
+        const horariosHTML = `
+          <div class="horarios-grid" id="horariosGridSeleccion">
+            ${horariosLibres.map((horario, index) => {
+              const horaInicio = horario.hora_inicio.substring(0, 5);
+              const horaFin = horario.hora_fin.substring(0, 5);
+              return `
+                <button class="horario-btn ${reservaActual.horario === horario.hora_inicio ? 'selected' : ''}" 
+                        data-index="${index}" 
+                        data-horario="${horario.hora_inicio}" 
+                        data-fin="${horario.hora_fin}">
+                  <div style="font-size: 18px; font-weight: 700;">${horaInicio}</div>
+                  <div style="font-size: 14px; opacity: 0.7;">hasta</div>
+                  <div style="font-size: 18px; font-weight: 700;">${horaFin}</div>
+                  <span class="muted">1 hora</span>
+                </button>
+              `;
+            }).join('')}
+          </div>
+        `;
+
+        document.getElementById('horariosContainer').innerHTML = horariosHTML;
+        
+        // Agregar event listeners
+        setTimeout(() => {
+          document.querySelectorAll('#horariosGridSeleccion .horario-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+              seleccionarHorario(btn.dataset.horario, btn.dataset.fin);
+            });
+          });
+        }, 0);
       } catch (error) {
-        document.getElementById('canchasContainer').innerHTML = `
+        console.error('❌ Error cargando horarios:', error);
+        document.getElementById('horariosContainer').innerHTML = `
           <div class="table-empty">
-            <p>Error cargando canchas: ${error.message}</p>
+            <p>Error: ${error.message}</p>
           </div>
         `;
       }
@@ -668,28 +710,43 @@
 
     // FUNCIONES DE SELECCIÓN
     function seleccionarLocalidad(localidad) {
-      reservaActual.localidad = localidad;
-      mostrarPasoActual();
+      // Normalizar el objeto para que siempre tenga id_localidad
+      reservaActual.localidad = {
+        id_localidad: localidad.id || localidad.id_localidad,
+        id: localidad.id || localidad.id_localidad,
+        nombre: localidad.nombre
+      };
+      console.log('✅ Localidad seleccionada:', reservaActual.localidad);
+      siguientePaso();
     }
 
     function seleccionarDeporte(deporte) {
       reservaActual.deporte = deporte;
-      mostrarPasoActual();
+      console.log('✅ Deporte seleccionado:', deporte);
+      siguientePaso();
     }
 
     function seleccionarFecha(fecha) {
+      if (!fecha) {
+        console.warn('⚠️ No se seleccionó fecha');
+        return;
+      }
       reservaActual.fecha = fecha;
-      mostrarPasoActual();
+      console.log('✅ Fecha seleccionada:', fecha);
+      siguientePaso();
     }
 
-    function seleccionarHorario(horario) {
+    function seleccionarHorario(horario, horaFin) {
       reservaActual.horario = horario;
-      mostrarPasoActual();
+      reservaActual.hora_fin = horaFin;
+      console.log('✅ Horario seleccionado:', horario, '-', horaFin);
+      siguientePaso();
     }
 
     function seleccionarCancha(cancha) {
       reservaActual.cancha = cancha;
-      mostrarPasoActual();
+      console.log('✅ Cancha seleccionada:', cancha);
+      siguientePaso();
     }
 
     function toggleServicio(servicio) {
@@ -890,7 +947,7 @@ function setupEventListeners() {
       }
 
       try {
-        const hora_fin = calcularHoraFin(reservaActual.horario, 1);
+        const hora_fin = reservaActual.hora_fin || calcularHoraFin(reservaActual.horario, 1);
         const id_servicios = reservaActual.servicios.map(s => s.id_servicio);
 
         const reservaData = {
@@ -902,6 +959,8 @@ function setupEventListeners() {
           precio_total: reservaActual.precio_total,
           id_servicios: id_servicios
         };
+
+        console.log('📤 Enviando reserva:', reservaData);
 
         const response = await fetch(API['reservas'], {
           method: 'POST',

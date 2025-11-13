@@ -449,30 +449,54 @@ body{
 
 .horarios-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(80px, 1fr));
-    gap: 10px;
-    margin-top: 15px;
+    grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+    gap: 16px;
+    margin-top: 24px;
+    padding: 10px 0;
 }
 
 .horario-btn {
-    padding: 12px 8px;
-    border: 2px solid #e6e9ef;
-    border-radius: 8px;
+    padding: 20px 16px;
+    border: 2px solid #e0e4ea;
+    border-radius: 12px;
     background: white;
     cursor: pointer;
     text-align: center;
-    font-size: 14px;
-    transition: all 0.2s ease;
+    font-size: 16px;
+    font-weight: 600;
+    transition: all 0.3s ease;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.04);
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    min-height: 90px;
+    justify-content: center;
 }
 
 .horario-btn:hover {
-    background: #f8f9fa;
+    background: #f8fafb;
+    border-color: var(--primary);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(13, 94, 71, 0.15);
 }
 
 .horario-btn.selected {
-    background: var(--primary);
+    background: linear-gradient(135deg, var(--primary) 0%, #0a4d3a 100%);
     color: white;
     border-color: var(--primary);
+    box-shadow: 0 6px 16px rgba(13, 94, 71, 0.3);
+    transform: scale(1.05);
+}
+
+.horario-btn .muted {
+    font-size: 12px;
+    font-weight: 400;
+    opacity: 0.8;
+    margin-top: 4px;
+}
+
+.horario-btn.selected .muted {
+    opacity: 0.9;
 }
 
 .horario-btn.ocupado {
