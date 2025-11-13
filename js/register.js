@@ -139,21 +139,20 @@ function validarEmail(email) {
 
 async function cargarLocalidades() {
     try {
-        console.log('🔄 Cargando localidades desde:', `${API_URL}/localidades`);
+        console.log('- Cargando localidades desde:', `${API_URL}/localidades`);
         
         const response = await fetch(`${API_URL}/localidades`);
-        console.log('📡 Respuesta HTTP:', response.status, response.statusText);
+        console.log('- Respuesta HTTP:', response.status, response.statusText);
         
         const data = await response.json();
-        console.log('📦 Datos recibidos de localidades:', data);
-        
+        console.log('- Datos recibidos de localidades:', data);
+    
         const localidadSelect = document.getElementById('localidad');
         localidadSelect.innerHTML = '<option value="">Seleccione una localidad</option>';
         
        
         let localidadesArray = data;
         
-        // Si la respuesta tiene estructura {data: [...]} usamos data, sino usamos el array directamente
         if (data && Array.isArray(data.data)) {
             localidadesArray = data.data;
         } else if (data && Array.isArray(data)) {
@@ -173,20 +172,19 @@ async function cargarLocalidades() {
         
         localidadesArray.forEach(localidad => {
             const option = document.createElement('option');
-            // ✅ CORRECCIÓN: Tu entidad usa 'id' no 'id_localidad'
             option.value = localidad.id || localidad.id_localidad;
             option.textContent = localidad.nombre;
             console.log(`📍 Agregando localidad: ${localidad.nombre} (ID: ${localidad.id || localidad.id_localidad})`);
             localidadSelect.appendChild(option);
         });
         
-        console.log('✅ Localidades cargadas correctamente');
+        console.log('- Localidades cargadas correctamente');
         
     } catch (error) {
-        console.error('❌ Error cargando localidades:', error);
+        console.error('- Error cargando localidades:', error);
         mostrarMensaje('Error cargando localidades. Verifique la conexión con el servidor.', 'error');
         
-        // Opciones de emergencia
+    
         const localidadSelect = document.getElementById('localidad');
         const opcionesEmergencia = [
             { id: 1, nombre: 'Rosario' },
@@ -210,7 +208,6 @@ function mostrarMensaje(texto, tipo) {
         messageDiv.className = `message ${tipo}`;
         messageDiv.style.display = 'block';
         
-        // Auto-ocultar después de 5 segundos para errores, mantener para éxito
         if (tipo !== 'success') {
             setTimeout(() => {
                 messageDiv.style.display = 'none';

@@ -1,6 +1,3 @@
-    /***********************
-     * Config inicial
-     ***********************/
     const API_BASE = 'http://localhost:3000';
     const API = {
       'localidades': API_BASE + '/api/localidades',
@@ -16,7 +13,6 @@
       'reservas-por-fecha': API_BASE + '/api/reservas'
     };
 
-    // id field mapping (para identificar registros)
     const idField = {
       'localidades': 'id_localidad',
       'tipo-canchas': 'id_tipo',
@@ -27,19 +23,18 @@
       'reservas': 'id_reserva'
     };
 
-    // estado/campo defaults
     const estadoOptions = ['disponible','ocupada','mantenimiento'];
 
     let currentEntity = 'localidades';
     let dataCache = {};
     let currentPage = 1, pageSize = 12;
 
-    // Variables para los filtros
+    
     let filtroTipoCancha = '';
     let filtroFechaInicio = '';
     let filtroFechaFin = '';
 
-    // DOM refs
+    
     const menuItems = document.querySelectorAll('.menu li');
     const mainTitle = document.getElementById('mainTitle');
     const tableWrap = document.getElementById('tableWrap');
@@ -67,19 +62,19 @@
     closeModalBtn.addEventListener('click', closeModal);
     modalSave.addEventListener('click', onModalSave);
     
-    // Toggle sidebar desde botón X interno
+    //  sidebar desde botón X interno
     btnToggle.addEventListener('click', ()=> {
         sidebar.classList.remove('open');
         sidebarOverlay.classList.remove('show');
     });
     
-    // Toggle sidebar desde botón hamburguesa
+    //  sidebar desde botón hamburguesa
     menuToggle.addEventListener('click', ()=> {
         sidebar.classList.add('open');
         sidebarOverlay.classList.add('show');
     });
     
-    // Cerrar sidebar al hacer click en overlay
+    // cerrar sidebar al hacer click en overlay
     sidebarOverlay.addEventListener('click', ()=> {
         sidebar.classList.remove('open');
         sidebarOverlay.classList.remove('show');
@@ -92,9 +87,9 @@
       currentPage = 1;
       mainTitle.textContent = titleFromEntity(currentEntity);
       
-      // Manejar los nuevos items especiales
+      // manejar los nuevos items especiales
       if (currentEntity === 'canchas-por-tipo') {
-        // Precargar datos necesarios
+        // precargar datos necesarios
         Promise.all([
           fetchIfNeeded('canchas'),
           fetchIfNeeded('tipo-canchas')
@@ -102,7 +97,7 @@
           mostrarFiltroCanchasPorTipo();
         });
       } else if (currentEntity === 'reservas-por-fecha') {
-        // Precargar datos necesarios
+        // precargar datos necesarios
         Promise.all([
           fetchIfNeeded('reservas'),
           fetchIfNeeded('usuarios'),
@@ -111,8 +106,8 @@
           mostrarFiltroReservasPorFecha();
         });
       } else {
-        // Entidades normales
-        loadEntity(currentEntity);
+        // entidades normales
+        loadEntity(currentEntity); 
       }
     }));
 
@@ -159,9 +154,7 @@
       }
     }
 
-    /***********************
-     * Fetch helpers
-     ***********************/
+
     async function fetchIfNeeded(entity){
       if(!dataCache[entity] || !Array.isArray(dataCache[entity]) || dataCache[entity].length===0){
         await loadEntity(entity);
@@ -197,7 +190,7 @@
         console.log(`📊 ${entity} cargados:`, dataCache[entity].length, 'registros');
         renderTable();
       } catch(err){
-        console.error(`❌ Error cargando ${entity}:`, err);
+        console.error(`- Error cargando ${entity}:`, err);
         showToast('Error al cargar ' + entity + ': ' + err.message);
         tableWrap.innerHTML = `<div class="table-empty">No se pudieron cargar los datos: ${err.message}</div>`;
       } finally {
@@ -205,7 +198,7 @@
       }
     }
 
-    // generic delete (assume DELETE /api/entity/:id)
+  
     async function deleteEntity(entity, id){
       const idKey = idField[entity];
       if(!confirm('Seguro querés eliminar este registro?')) return;
@@ -232,11 +225,7 @@
       }
     }
 
-    /***********************
-     * Nuevas funciones de filtrado
-     ***********************/
-
-    // Función para mostrar el modal de filtro de canchas por tipo
+    // función para mostrar el modal de filtro de canchas por tipo
     function mostrarFiltroCanchasPorTipo() {
       modalTitle.textContent = 'Filtrar Canchas por Tipo';
       const tipos = dataCache['tipo-canchas'] || [];
@@ -263,7 +252,7 @@
       };
     }
 
-    // Función para aplicar el filtro de canchas por tipo
+    //  aplicar el filtro de canchas por tipo
     function aplicarFiltroCanchasPorTipo() {
       const select = document.getElementById('filtroTipoCancha');
       filtroTipoCancha = select ? select.value : '';
@@ -271,7 +260,7 @@
       renderCanchasFiltradasPorTipo();
     }
 
-    // Función para renderizar canchas filtradas por tipo
+    //  renderizar canchas filtradas por tipo
     function renderCanchasFiltradasPorTipo() {
       const todasCanchas = dataCache['canchas'] || [];
       const tipos = dataCache['tipo-canchas'] || [];
@@ -350,7 +339,7 @@
       paginationDiv.innerHTML = ''; // No paginación para filtros
     }
 
-    // Función para mostrar el modal de filtro de reservas por fecha
+    // mostrar el modal de filtro de reservas por fecha
     function mostrarFiltroReservasPorFecha() {
       modalTitle.textContent = 'Filtrar Reservas por Fecha';
       const hoy = new Date().toISOString().split('T')[0];
@@ -370,13 +359,13 @@
       modalSave.textContent = 'Aplicar Filtro';
       modal.classList.remove('hidden');
       
-      // Guardar referencia temporal de las funciones
+      //  referencia temporal de las funciones
       modalSave.onclick = function() {
         aplicarFiltroReservasPorFecha();
       };
     }
 
-    // Función para aplicar el filtro de reservas por fecha
+    // aplicar el filtro de reservas por fecha
     function aplicarFiltroReservasPorFecha() {
       const inputInicio = document.getElementById('filtroFechaInicio');
       const inputFin = document.getElementById('filtroFechaFin');
@@ -388,7 +377,7 @@
       renderReservasFiltradasPorFecha();
     }
 
-    // Función para renderizar reservas filtradas por fecha
+    //  renderizar reservas filtradas por fecha
     function renderReservasFiltradasPorFecha() {
       const todasReservas = dataCache['reservas'] || [];
       const usuarios = dataCache['usuarios'] || [];
@@ -403,7 +392,7 @@
         });
       }
       
-      // Ordenar por fecha y hora
+      //  por fecha y hora
       reservasFiltradas.sort((a, b) => {
         const fechaA = new Date(a.fecha + 'T' + a.hora_inicio);
         const fechaB = new Date(b.fecha + 'T' + b.hora_inicio);
@@ -473,9 +462,7 @@
       paginationDiv.innerHTML = ''; // No paginación para filtros
     }
 
-    /***********************
-     * Render tabla principal
-     ***********************/
+    
     function renderTable(){
       const items = (dataCache[currentEntity] || []).slice();
       const q = (searchInput.value || '').trim().toLowerCase();
@@ -681,9 +668,7 @@
       }));
     }
 
-    /***********************
-     * Modal: crear / editar
-     ***********************/
+   
     let modalMode = 'create';
     let modalEditingId = null;
 
@@ -724,7 +709,7 @@
       }
     }
 
-    // 🔹 NUEVA FUNCIÓN: Configurar cálculo de precio en tiempo real para reservas
+    // calc en tiempo real
     async function setupPrecioCalculo() {
       const id_cancha = document.getElementById('field_id_cancha');
       const fecha = document.getElementById('field_fecha');
@@ -735,7 +720,7 @@
       const precioDisplay = document.getElementById('precio_calculado');
 
       if (!precioDisplay) {
-        // Crear display de precio si no existe
+        // display de precio si no existe
         const precioHtml = `
           <div class="price-calculation">
             <div class="price-breakdown" id="precio_desglose">Seleccioná una cancha, fecha y horario para calcular el precio</div>
@@ -747,7 +732,7 @@
         }
       }
 
-      // Función para calcular precio
+      //  calcular precio
       const calcularPrecio = async () => {
         if (!id_cancha || !fecha || !hora_inicio || !hora_fin) return;
 
@@ -804,7 +789,6 @@
       }
     }
 
-    // 🔹 FUNCIÓN AUXILIAR: Calcular diferencia de horas
     function calcularDiferenciaHoras(hora_inicio, hora_fin) {
       const inicio = new Date(`2000-01-01T${hora_inicio}`);
       const fin = new Date(`2000-01-01T${hora_fin}`);
@@ -1163,9 +1147,6 @@
       modalEditingId = null;
     }
 
-    /***********************
-     * Utils
-     ***********************/
     function showToast(msg, time = 3000){
       toast.textContent = msg;
       toast.classList.remove('hidden');
@@ -1182,11 +1163,11 @@
     }
 
     function showLoading(){
-      // opcional: podés implementar un overlay
+   
     }
     function hideLoading(){ }
 
-    // expose some functions to HTML scope used in onclick
+   
     window.openModal = openModal;
     window.deleteEntity = deleteEntity;
     window.mostrarFiltroCanchasPorTipo = mostrarFiltroCanchasPorTipo;
