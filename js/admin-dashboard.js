@@ -13,6 +13,16 @@
       'reservas-por-fecha': API_BASE + '/api/reservas'
     };
 
+    // Helper para incluir JWT token en las peticiones
+    function getAuthHeaders() {
+      const token = localStorage.getItem('authToken');
+      const headers = {'Content-Type': 'application/json'};
+      if (token) {
+        headers['Authorization'] = `Bearer ${token}`;
+      }
+      return headers;
+    }
+
     const idField = {
       'localidades': 'id_localidad',
       'tipo-canchas': 'id_tipo',
@@ -139,16 +149,37 @@
 
     function verificarAdmin(){
       try{
+        const token = localStorage.getItem('authToken');
         const userData = localStorage.getItem('userData') || sessionStorage.getItem('userData');
-        if(!userData){ adminName.textContent = 'Admin'; return; }
+        
+        // Verificar que exista token y datos de usuario
+        if(!token || !userData){ 
+          console.warn('⚠️ No hay token o datos de usuario, redirigiendo al login...');
+          window.location.href = 'index.html';
+          return;
+        }
+        
         const usuario = JSON.parse(userData);
+        
+        // Verificar que sea administrador
+        if(usuario.rol !== 'administrador') {
+          console.warn('⚠️ Usuario no es administrador, redirigiendo...');
+          alert('No tenés permisos para acceder a esta página');
+          window.location.href = 'index.html';
+          return;
+        }
+        
         adminName.textContent = `${usuario.nombre || usuario.firstName || ''} ${usuario.apellido || usuario.lastName || ''}`.trim();
-      }catch(e){ adminName.textContent = 'Admin'; }
+      }catch(e){ 
+        console.error('Error verificando admin:', e);
+        window.location.href = 'index.html';
+      }
     }
 
     function cerrarSesion() {
       if(confirm('¿Estás seguro de que querés cerrar sesión?')) {
         localStorage.removeItem('userData');
+        localStorage.removeItem('authToken');
         sessionStorage.removeItem('userData');
         window.location.href = 'index.html';
       }
@@ -165,7 +196,9 @@
       showLoading();
       try {
         console.log(`🔄 Cargando entidad: ${entity} desde ${API[entity]}`);
-        const res = await fetch(API[entity]);
+        const res = await fetch(API[entity], {
+          headers: getAuthHeaders()
+        });
         
         if(!res.ok) {
           const errorText = await res.text();
@@ -204,10 +237,9 @@
       if(!confirm('Seguro querés eliminar este registro?')) return;
       try{
         const path = (entity === 'reserva-servicio') ? API['reserva-servicio'] : (API[entity] + '/' + id);
-        const options = { method: 'DELETE' };
+        const options = { method: 'DELETE', headers: getAuthHeaders() };
         // reserva-servicio deletion needs body {id_reserva, id_servicio}
         if(entity === 'reserva-servicio' && typeof id === 'object'){
-          options.headers = {'Content-Type':'application/json'};
           options.body = JSON.stringify(id);
         }
         const res = await fetch(path, options);
@@ -742,7 +774,7 @@
         try {
           const response = await fetch(API['reservas'] + '/calcular-precio', {
             method: 'POST',
-            headers: {'Content-Type': 'application/json'},
+            headers: getAuthHeaders(),
             body: JSON.stringify({
               id_cancha: parseInt(id_cancha.value),
               fecha: fecha.value,
@@ -815,7 +847,9 @@
       
       if(!currentItem){
         try {
-          const res = await fetch(API[currentEntity] + '/' + id);
+          const res = await fetch(API[currentEntity] + '/' + id, {
+            headers: getAuthHeaders()
+          });
           if(res.ok) {
             const result = await res.json();
             currentItem = result.data || result;
@@ -1023,7 +1057,7 @@
         if(modalMode === 'create'){
           res = await fetch(API[currentEntity], {
             method: 'POST',
-            headers: {'Content-Type':'application/json'},
+            headers: getAuthHeaders(),
             body: JSON.stringify(payload)
           });
         } else {
@@ -1031,7 +1065,7 @@
           const path = API[currentEntity] + '/' + id;
           res = await fetch(path, {
             method: 'PUT',
-            headers: {'Content-Type':'application/json'},
+            headers: getAuthHeaders(),
             body: JSON.stringify(payload)
           });
         }

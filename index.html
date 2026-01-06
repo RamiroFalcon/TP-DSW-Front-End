@@ -48,60 +48,6 @@
 
   <!-- Vue 3 por CDN (no necesita instalación) -->
   <script src="https://unpkg.com/vue@3/dist/vue.global.prod.js"></script>
-  <script>
-    const { createApp } = Vue;
-    const API_URL = 'http://localhost:3000/api';
-
-    createApp({
-      data() {
-        return { form: { username: '', password: '' }, loading: false, message: '', messageType: '' };
-      },
-      methods: {
-        async handleLogin() {
-          this.message = ''; this.messageType = '';
-          if (!this.form.username || !this.form.password) {
-            this.message = 'Completá usuario y contraseña.'; this.messageType = 'error'; return;
-          }
-          this.loading = true;
-          try {
-            const res = await fetch(`${API_URL}/auth/login`, {
-              method: 'POST',
-              headers: { 'Content-Type': 'application/json' },
-              body: JSON.stringify({ username: this.form.username, password: this.form.password })
-            });
-            const data = await res.json();
-
-            if (res.ok && data.success && data.data) {
-              const user = data.data;
-              sessionStorage.setItem('userData', JSON.stringify({
-                id: user.id_usuario,
-                id_usuario: user.id_usuario,
-                username: user.username,
-                nombre: user.nombre,
-                apellido: user.apellido,
-                email: user.email,
-                dni: user.dni,
-                rol: user.rol
-              }));
-              this.message = 'Login exitoso! Redirigiendo...'; this.messageType = 'success';
-              setTimeout(() => {
-                if (user.rol === 'administrador') window.location.href = 'admin-dashboard.html';
-                else window.location.href = 'reservar-turno.html';
-              }, 700);
-            } else {
-              this.message = (data && data.message) || 'Usuario o contraseña incorrectos';
-              this.messageType = 'error';
-            }
-          } catch (e) {
-            console.error(e);
-            this.message = 'Error de conexión. Verificá que el backend esté en localhost:3000';
-            this.messageType = 'error';
-          } finally {
-            this.loading = false;
-          }
-        }
-      }
-    }).mount('#app');
-  </script>
+  <script src="js/login.js"></script>
 </body>
 </html>

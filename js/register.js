@@ -1,5 +1,15 @@
 const API_URL = 'http://localhost:3000/api';
 
+// Helper para incluir JWT token en las peticiones (si fuera necesario en el futuro)
+function getAuthHeaders() {
+  const token = localStorage.getItem('authToken');
+  const headers = {'Content-Type': 'application/json'};
+  if (token) {
+    headers['Authorization'] = `Bearer ${token}`;
+  }
+  return headers;
+}
+
 document.addEventListener('DOMContentLoaded', function() {
     console.log('Register.js cargado correctamente');
     

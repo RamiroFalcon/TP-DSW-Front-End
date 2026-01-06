@@ -10,6 +10,16 @@ const API = {
   'pagos': API_BASE + '/api/pagos'
 };
 
+// Helper para incluir JWT token en las peticiones
+function getAuthHeaders() {
+  const token = localStorage.getItem('authToken');
+  const headers = {'Content-Type': 'application/json'};
+  if (token) {
+    headers['Authorization'] = `Bearer ${token}`;
+  }
+  return headers;
+}
+
 // Estado de la aplicación
 let currentUser = null;
 let currentSection = 'mis-reservas';
@@ -34,6 +44,17 @@ document.addEventListener('DOMContentLoaded', function() {
 
 function init() {
   console.log('Inicializando aplicación...');
+  
+  // Verificar autenticación
+  const token = localStorage.getItem('authToken');
+  const userData = localStorage.getItem('userData') || sessionStorage.getItem('userData');
+  
+  if(!token || !userData) {
+    console.warn('⚠️ No hay token o datos de usuario, redirigiendo al login...');
+    window.location.href = 'index.html';
+    return;
+  }
+  
   cargarUsuario();
   setupEventListeners();
   cargarSeccion('mis-reservas');
@@ -127,7 +148,9 @@ async function cargarMisReservas() {
   }
 
   try {
-    const response = await fetch(API['reservas']);
+    const response = await fetch(API['reservas'], {
+      headers: getAuthHeaders()
+    });
     const result = await response.json();
 
     if (!result.success) throw new Error(result.message);
@@ -139,7 +162,9 @@ async function cargarMisReservas() {
     const reservasConPagos = await Promise.all(
       misReservas.map(async (reserva) => {
         try {
-          const pagoResponse = await fetch(`${API['pagos']}/reserva/${reserva.id_reserva}`);
+          const pagoResponse = await fetch(`${API['pagos']}/reserva/${reserva.id_reserva}`, {
+            headers: getAuthHeaders()
+          });
           const pagoResult = await pagoResponse.json();
           
           return {
@@ -452,9 +477,7 @@ async function cargarCanchasParaSeleccionar() {
     
     const response = await fetch(API['buscar-canchas'], {
       method: 'POST',
-      headers: {
-        'Content-Type': 'application/json'
-      },
+      headers: getAuthHeaders(),
       body: JSON.stringify(body)
     });
     
@@ -790,7 +813,9 @@ async function eliminarReserva(id_reserva) {
 
     try {
         // Verificar estado del pago antes de eliminar
-        const pagoResponse = await fetch(`${API['pagos']}/reserva/${id_reserva}`);
+        const pagoResponse = await fetch(`${API['pagos']}/reserva/${id_reserva}`, {
+            headers: getAuthHeaders()
+        });
         const pagoResult = await pagoResponse.json();
         
         if (pagoResult.success && pagoResult.data && pagoResult.data.estado === 'completado') {
@@ -799,7 +824,8 @@ async function eliminarReserva(id_reserva) {
         }
 
         const response = await fetch(`${API['reservas']}/${id_reserva}`, {
-            method: 'DELETE'
+            method: 'DELETE',
+            headers: getAuthHeaders()
         });
 
         const result = await response.json();
@@ -821,7 +847,9 @@ async function eliminarReserva(id_reserva) {
 async function modificarReserva(id_reserva) {
     try {
         // Verificar estado del pago antes de modificar
-        const pagoResponse = await fetch(`${API['pagos']}/reserva/${id_reserva}`);
+        const pagoResponse = await fetch(`${API['pagos']}/reserva/${id_reserva}`, {
+            headers: getAuthHeaders()
+        });
         const pagoResult = await pagoResponse.json();
         
         if (pagoResult.success && pagoResult.data && pagoResult.data.estado === 'completado') {
@@ -830,7 +858,9 @@ async function modificarReserva(id_reserva) {
         }
 
         // Obtener datos actuales de la reserva
-        const reservaResponse = await fetch(`${API['reservas']}/${id_reserva}`);
+        const reservaResponse = await fetch(`${API['reservas']}/${id_reserva}`, {
+            headers: getAuthHeaders()
+        });
         const reservaResult = await reservaResponse.json();
 
         if (!reservaResult.success) {
@@ -879,7 +909,9 @@ async function modificarReserva(id_reserva) {
 // Función auxiliar para obtener localidad de una cancha
 async function obtenerLocalidadDeCancha(id_cancha) {
     try {
-        const response = await fetch(`${API['canchas']}/${id_cancha}`);
+        const response = await fetch(`${API['canchas']}/${id_cancha}`, {
+            headers: getAuthHeaders()
+        });
         const result = await response.json();
         
         if (result.success) {
@@ -897,7 +929,9 @@ async function obtenerLocalidadDeCancha(id_cancha) {
 // Función auxiliar para obtener deporte de una cancha
 async function obtenerDeporteDeCancha(id_cancha) {
     try {
-        const response = await fetch(`${API['canchas']}/${id_cancha}`);
+        const response = await fetch(`${API['canchas']}/${id_cancha}`, {
+            headers: getAuthHeaders()
+        });
         const result = await response.json();
         
         if (result.success) {
@@ -915,7 +949,9 @@ async function obtenerDeporteDeCancha(id_cancha) {
 // Función auxiliar para obtener cancha completa
 async function obtenerCanchaCompleta(id_cancha) {
     try {
-        const response = await fetch(`${API['canchas']}/${id_cancha}`);
+        const response = await fetch(`${API['canchas']}/${id_cancha}`, {
+            headers: getAuthHeaders()
+        });
         const result = await response.json();
         return result.success ? result.data : null;
     } catch (error) {
@@ -927,7 +963,9 @@ async function obtenerCanchaCompleta(id_cancha) {
 // Función auxiliar para obtener servicios de una reserva
 async function obtenerServiciosDeReserva(id_reserva) {
     try {
-        const response = await fetch(`${API['reservas']}/${id_reserva}/servicios`);
+        const response = await fetch(`${API['reservas']}/${id_reserva}/servicios`, {
+            headers: getAuthHeaders()
+        });
         const result = await response.json();
         
         if (result.success) {
@@ -945,7 +983,9 @@ async function mostrarPago(id_reserva) {
         reservaSeleccionadaPago = id_reserva;
         
         // Obtener información de la reserva
-        const reservaResponse = await fetch(`${API['reservas']}/${id_reserva}`);
+        const reservaResponse = await fetch(`${API['reservas']}/${id_reserva}`, {
+            headers: getAuthHeaders()
+        });
         const reservaResult = await reservaResponse.json();
 
         if (!reservaResult.success) {
@@ -955,7 +995,9 @@ async function mostrarPago(id_reserva) {
         const reserva = reservaResult.data;
 
         // Obtener información del pago existente o crear uno nuevo
-        let pagoResponse = await fetch(`${API['pagos']}/reserva/${id_reserva}`);
+        let pagoResponse = await fetch(`${API['pagos']}/reserva/${id_reserva}`, {
+            headers: getAuthHeaders()
+        });
         let pagoResult = await pagoResponse.json();
 
         let pago;
@@ -963,7 +1005,7 @@ async function mostrarPago(id_reserva) {
             // Crear nuevo pago si no existe
             const crearPagoResponse = await fetch(API['pagos'], {
                 method: 'POST',
-                headers: {'Content-Type': 'application/json'},
+                headers: getAuthHeaders(),
                 body: JSON.stringify({
                     id_reserva: id_reserva,
                     monto: reserva.precio_total,
@@ -1091,7 +1133,8 @@ async function procesarPago(event) {
     try {
         // Simular procesamiento de pago
         const response = await fetch(`${API['pagos']}/${pagoActual.id_pago}/simular`, {
-            method: 'POST'
+            method: 'POST',
+            headers: getAuthHeaders()
         });
 
         const result = await response.json();
@@ -1100,7 +1143,9 @@ async function procesarPago(event) {
             // Esperar un poco más para simular el procesamiento
             setTimeout(async () => {
                 // Verificar estado final del pago
-                const estadoResponse = await fetch(`${API['pagos']}/${pagoActual.id_pago}`);
+                const estadoResponse = await fetch(`${API['pagos']}/${pagoActual.id_pago}`, {
+                    headers: getAuthHeaders()
+                });
                 const estadoResult = await estadoResponse.json();
 
                 if (estadoResult.success && estadoResult.data.estado === 'completado') {
@@ -1183,7 +1228,9 @@ function closeSidebar() {
 async function fetchIfNeeded(entity) {
   if (!dataCache[entity] || !Array.isArray(dataCache[entity]) || dataCache[entity].length === 0) {
     try {
-      const response = await fetch(API[entity]);
+      const response = await fetch(API[entity], {
+        headers: getAuthHeaders()
+      });
       const result = await response.json();
       dataCache[entity] = Array.isArray(result) ? result : (result.data || []);
     } catch (error) {
@@ -1258,6 +1305,7 @@ function showToast(msg, time = 3000) {
 function cerrarSesion() {
   if (confirm('¿Estás seguro de que querés cerrar sesión?')) {
     localStorage.removeItem('userData');
+    localStorage.removeItem('authToken');
     sessionStorage.removeItem('userData');
     window.location.href = 'index.html';
   }
@@ -1276,7 +1324,7 @@ async function calcularPrecioFinal() {
 
     const response = await fetch(API['reservas'] + '/calcular-precio', {
       method: 'POST',
-      headers: {'Content-Type': 'application/json'},
+      headers: getAuthHeaders(),
       body: JSON.stringify({
         id_cancha: reservaActual.cancha.id_cancha,
         fecha: reservaActual.fecha,
@@ -1323,7 +1371,7 @@ async function finalizarReserva(pagarAhora = false) {
 
     const response = await fetch(API['reservas'], {
       method: 'POST',
-      headers: {'Content-Type': 'application/json'},
+      headers: getAuthHeaders(),
       body: JSON.stringify(reservaData)
     });
 
@@ -1352,7 +1400,7 @@ async function crearPago(id_reserva, monto) {
   try {
     const response = await fetch(API['pagos'], {
       method: 'POST',
-      headers: {'Content-Type': 'application/json'},
+      headers: getAuthHeaders(),
       body: JSON.stringify({
         id_reserva: id_reserva,
         monto: monto,
